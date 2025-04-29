@@ -2,7 +2,7 @@
 \usepackage[russian]{babel}
 \usepackage{amsmath, amsthm, amsfonts, amssymb}
 \usepackage{tikz}
-\usetikzlibrary{shapes, arrows}
+\usetikzlibrary{shapes, arrows, positioning}
 \usepackage{graphicx}
 \usepackage{hyperref}
 \usepackage{pgfplots}
@@ -211,7 +211,7 @@
       \legend{Python-разработчики,Java-разработчики,Бухгалтеры}
     \end{axis}
   \end{tikzpicture}
-  \caption{Визуализация векторных представлений резюме в двумерном пространстве}
+  \caption{\centering Визуализация векторных представлений резюме в двумерном пространстве}
   \label{fig:embedding_visualization}
 \end{figure}
 
@@ -234,7 +234,71 @@
 
 где $d(x,y)$ --- функция расстояния между векторами, $a$ --- якорь, $p$ --- позитивный пример, $n$ --- негативный пример.
 
-Одной из основных проблем при использовании Triplet Loss является выбор негативных примеров. Случайный выбор негативных примеров часто приводит к <<лёгким>> триплетам, на которых модель не получает полезного сигнала для обучения. Действительно, найти негативный пример, который сильно отличается от якоря (например, резюме бухгалтера для якоря-резюме программиста), достаточно просто.
+\subsubsection{Генерация позитивных примеров}
+
+Для генерации позитивных примеров в данной работе использовался подход, основанный на анализе карьерного пути кандидатов. Предполагается, что успешные переходы между позициями в карьере человека указывают на схожесть требуемых навыков и компетенций.
+
+При таком подходе каждая новая позиция в карьере кандидата рассматривается как "вакансия" (anchor), а предыдущий опыт работы --- как позитивный пример (positive). Это позволяет автоматически формировать пары семантически близких резюме на основе реальных карьерных переходов.
+
+\begin{figure}[H]
+  \centering
+  \begin{tikzpicture}[
+      box/.style={draw, rectangle, minimum width=3cm, minimum height=0.8cm, align=center, font=\small},
+      arrow/.style={->, thick}
+    ]
+    \node at (-2,1) {Датапоинт 1};
+
+    \node[box] (job1) at (-2,0) {Junior Python Dev\\2020-2021};
+    \node[box] (job2) at (-2,-1.5) {Middle Python Dev\\2021-2022};
+    \node[box] (job3) at (-2,-3) {Senior Python Dev\\2022-present};
+
+    \draw[arrow] (job1) -- (job2);
+    \draw[arrow] (job2) -- (job3);
+
+    \node[right=0.3cm of job3] (anchor) {\parbox{1.5cm}{\small Anchor\\вакансия}};
+    \node[right=0.3cm of job2] (positive) {\parbox{1.5cm}{\small Positive\\релевантный опыт}};
+
+    \draw[arrow, dashed] (job3.east) -- (anchor.west);
+    \draw[arrow, dashed] (job2.east) -- (positive.west);
+    \draw[arrow, dashed] (job1.east) -- (positive.west);
+  \end{tikzpicture}
+  \hspace{1cm}
+  \begin{tikzpicture}[
+      box/.style={draw, rectangle, minimum width=3cm, minimum height=0.8cm, align=center, font=\small},
+      arrow/.style={->, thick}
+    ]
+    \node at (2,1) {Датапоинт 2};
+
+    \node[box] (job1) at (2,0) {Junior Python Dev\\2020-2021};
+    \node[box] (job2) at (2,-1.5) {Middle Python Dev\\2021-2022};
+    \node[box] (job3) at (2,-3) {Senior Python Dev\\2022-present};
+
+    \draw[arrow] (job1) -- (job2);
+    \draw[arrow] (job2) -- (job3);
+
+    \node[right=0.3cm of job2] (anchor) {\parbox{1.5cm}{\small Anchor\\вакансия}};
+    \node[right=0.3cm of job1] (positive) {\parbox{1.5cm}{\small Positive\\релевантный опыт}};
+
+    \draw[arrow, dashed] (job2.east) -- (anchor.west);
+    \draw[arrow, dashed] (job1.east) -- (positive.west);
+  \end{tikzpicture}
+
+  \vspace{0.5cm}
+  \caption{\centering Примеры формирования пар anchor-positive на основе карьерного пути}
+  \label{fig:career_path_example}
+\end{figure}
+
+Например, как показано на рис.~\ref{fig:career_path_example}, если кандидат успешно продвигался по карьерной лестнице от Junior до Senior Python Developer, то можно считать, что его опыт работы на позиции Junior Python Developer является релевантным для позиции Middle Python Developer. Так же для позиции Senior Python Developer релевантным являлся опыт $\langle\text{Junior Python Dev},\text{Middle Python Dev}\rangle$.
+
+Такой подход имеет несколько преимуществ:
+\begin{itemize}
+  \item Автоматическая генерация большого количества обучающих примеров из реальных данных
+  \item Учёт естественной прогрессии карьерного роста
+  \item Отражение реальных требований рынка труда и успешных карьерных переходов
+\end{itemize}
+
+
+Одной из основных проблем при использовании Triplet Loss является сложность формирования качественных обучающих триплетов. Если позитивные примеры можно относительно легко получить из реальных данных (например, с помощью указанного выше подхода, либо когда компания приняла кандидата на работу или рекрутер отметил резюме как релевантное), то с негативными примерами ситуация гораздо сложнее. Тот факт, что рекрутер пропустил или не рассмотрел какое-то резюме, не обязательно означает, что данный кандидат не подходит для позиции.
 
 Для эффективного обучения необходимо использовать <<сложные>> негативные примеры --- те, которые достаточно похожи на якорь, но всё же должны быть классифицированы как отличающиеся. В контексте поиска резюме это могут быть, например, резюме специалистов из смежных, но всё же различных областей (например, для резюме Python-разработчика негативным примером может быть резюме системного администратора).
 
