@@ -345,7 +345,7 @@
           \allowdisplaybreaks[1]
           \begin{split}
             \text{Senior developer} & >_{s} \text{Middle developer} \\
-                                    & \land                         \\
+                                    & ~~~\land                      \\
             \text{Middle developer} & >_{s} \text{Junior developer} \\
                                     & \implies                      \\
             \text{Senior developer} & >_{s} \text{Junior developer}
@@ -507,6 +507,8 @@
 
 Данная лосс-функция пытается <<приблизить>> оценку младшей позиции к нулю, а старшей к единице, если отношение между ними не выполняется с учётом margin.
 
+Реализация процесса обучения с данной лосс-функцией на языке Python с использованием библиотеки HuggingFace представлена в приложении (листинг \ref{app-lst:1}).
+
 У данной лосс-функции, однако, есть один существенный недостаток: Очень медленная сходимость из-за того, что если модель верна, то обучение не происходит вовсе (лосс-функция равна 0). Когда модель становится достаточно хороша и предсказывает >90\% отношений, то огромная часть вычислительных ресурсов, затраченных на инференс модели, не приносит никакой пользы.
 
 Бороться с этим недостатком трудно, так как если штрафовать модель за недостаточную <<уверенность>> в предсказании, то есть продолжать приближать оценки к 0 и 1 даже при правильном предсказании, то это приведёт к тому, что модель не сможет выучить распределение оценок.
@@ -514,6 +516,24 @@
 Тем не менее, с данной лосс-функцией удалось достичь точности 0.95 на тестовой выборке, то есть модель смогла предсказать более 95\% отношений между позициями.
 
 При этом, обучение модели происходило в течение сотен эпох, что является крайне неэффективным.
+
+
+\newpage
+\section{Ранжирование с учётом опыта}\label{experience_ranking}
+
+Как было показано в предыдущем разделе, наличие отдельного фильтра, позволяющего сравнивать <<старшинство>> позиций, является удобным инструментом для рекрутеров.
+
+Однако, этот инструмент имеет следующие недостатки:
+
+\begin{itemize}
+  \item Продемонстрированный способ позволяет сравнивать только пары позиций. Однако резюме являет собой список позиций. Так как модель ассиметричной оценки возвращает численную оценку, то результаты её работы можно агрегировать (например, вычислять среднюю оценку по всем позициям в резюме). Очевидно, что более <<интеллектуальный>> метод оценки всего резюме (а не агрегации отдельных позиций) способен прозводить более точные результаты.
+  \item Для реализации предложенного фильтра требуется запустить модель такого же размера, что и эмбеддинговая модель, для каждой позиции из резюме, что довольно затратно.
+  \item Обучение модели ассиметричной оценки крайне неэффективно.
+\end{itemize}
+
+Однако проблема
+
+
 
 
 %=======================
@@ -661,6 +681,92 @@ $ \int\limits_a^b f(x)\,dx$ не всегда выглядит красиво д
 \end{thebibliography}
 
 
+%=======================
+\newpage
+\section*{Приложение}
+\addcontentsline{toc}{section}{Приложение}
+
+\begin{lstlisting}[language=Python, caption={Реализация PairwiseTrainer для обучения модели асимметричной оценки}, tabsize=2, label=app-lst:1, basicstyle=\small\sffamily]
+import torch
+from transformers import Trainer
+
+MARGIN = 0.01
+
+class PairwiseTrainer(Trainer):
+  def get_logits(self, model, inputs):
+    input_junior = {
+      'input_ids': (
+        inputs['input_ids'][:, 0, :].squeeze(dim=1)
+      ),
+      'attention_mask': (
+        inputs['attention_mask'][:, 0, :].squeeze(dim=1)
+      ),
+    }
+
+    input_senior = {
+      'input_ids': (
+        inputs['input_ids'][:, 1, :].squeeze(dim=1)
+      ),
+      'attention_mask': (
+        inputs['attention_mask'][:, 1, :].squeeze(dim=1)
+      ),
+    }
+    
+    output_junior = model(**input_junior)
+    output_senior = model(**input_senior)
+
+    return output_junior, output_senior
+  
+  def loss_from_logits(self, model,output_junior,  output_senior):
+    diff = MARGIN + output_junior - output_senior
+    
+    junior_loss = model.distance_loss(
+      output_junior, 
+      torch.zeros_like(output_junior)
+    )
+    senior_loss = model.distance_loss(
+      output_senior,
+      torch.ones_like(output_senior)
+    )
+    
+    seniority_loss = torch.where(
+      diff >= 0,
+      junior_loss + senior_loss,
+      diff * 0
+    )
+
+    return torch.mean(seniority_loss)
+
+  def compute_loss(self, model, inputs):
+    output_junior, output_senior = self.get_logits(
+      model, inputs
+    )
+    return self.loss_from_logits(
+      model, output_junior, output_senior
+    )
+  
+  def prediction_step(self, 
+    model, 
+    inputs, 
+    prediction_loss_only, 
+    ignore_keys=None
+  ):
+    with torch.no_grad():
+      output_junior, output_senior = self.get_logits(
+        model, inputs
+        )
+      loss = self.loss_from_logits(
+        model, output_junior, output_senior
+      )
+      logits = torch.stack(
+        (output_junior, output_senior), 
+        dim=1
+      ).detach()
+
+      # return loss and other outputs for evaluation
+      return (loss, logits, torch.ones_like(logits))
+\end{lstlisting}
+
 
 \end{document}
 % ----------------------------------------------------------------
@@ -706,5 +812,3 @@ $ \int\limits_a^b f(x)\,dx$ не всегда выглядит красиво д
     \setlength{\parsep}{0pt}%
   \fi
 }
-\renewcommand{\thesection}{\arabic{section}.}
-\renewcommand{\thesubsection}{\arabic{section}.\arabic{subsection}.}
