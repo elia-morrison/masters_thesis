@@ -5,6 +5,7 @@
 \usetikzlibrary{shapes, arrows, positioning}
 \usepackage{graphicx}
 \usepackage{hyperref}
+\usepackage{tablefootnote}
 \usepackage{pgfplots}
 \pgfplotsset{compat=1.18}
 \pgfplotsset{
@@ -693,15 +694,15 @@ Sentence Transformers — это библиотека, которая упрощ
 
 \begin{table}[H]
   \centering
-  \caption{\centering Пример включения в строку информации о длительности работы на позиции ([SEP] --- специальный токен-разделитель, может быть опущен)}
+  \caption{\centering Пример включения в строку информации о длительности работы на позиции.}
   \label{tab:position_encoding_example}
   \begin{tabular}{|c|p{7cm}|p{7cm}|}
     \hline
-    \textbf{№} & \textbf{Псевдо-вакансия (anchor)}                         & \textbf{Опыт кандидата (positive)}                                                                                                          \\
+    \textbf{№} & \textbf{Псевдо-вакансия (anchor)}                   & \textbf{Опыт кандидата (positive)}                                                                                                                                                                                                                                                                                              \\
     \hline
-    1          & IT Business Analyst [SEP] (описание опыта на позиции)     & Python Backend Engineer (2020-2024) [SEP] (описание опыта на позиции) [SEP] Junior Python Dev (2019-2020) [SEP] (описание опыта на позиции) \\
+    1          & IT Business Analyst <описание опыта на позиции>     & Junior Python Dev (2019-2020) [SEP]\tablefootnote{[SEP] --- специальный токен-разделитель, может быть опущен.} Python Backend Engineer (2020-2024) <описание опыта на позиции>\tablefootnote{Описание опыта на позиции включено только для последней (или текущей) позиции, так как размер входного массива токенов ограничен.} \\
     \hline
-    2          & Python Backend Engineer [SEP] (описание опыта на позиции) & Junior Python Dev (2019-2020) [SEP] (описание опыта на позиции)                                                                             \\
+    2          & Python Backend Engineer <описание опыта на позиции> & Junior Python Dev (2019-2020) <описание опыта на позиции>                                                                                                                                                                                                                                                                       \\
     \hline
   \end{tabular}
 \end{table}
@@ -752,11 +753,11 @@ Sentence Transformers — это библиотека, которая упрощ
   \label{tab:position_encoding_example_2}
   \begin{tabular}{|c|p{7cm}|p{7cm}|}
     \hline
-    \textbf{№} & \textbf{Псевдо-вакансия (anchor)}                         & \textbf{Опыт кандидата (positive)}                                                                                                              \\
+    \textbf{№} & \textbf{Псевдо-вакансия (anchor)}                   & \textbf{Опыт кандидата (positive)}                                                                  \\
     \hline
-    1          & IT Business Analyst [SEP] (описание опыта на позиции)     & Python Backend Engineer [5YA][3-5YRS] [SEP] (описание опыта на позиции) [SEP] Junior Python Dev [5YA][0-1YRS] [SEP] (описание опыта на позиции) \\
+    1          & IT Business Analyst <описание опыта на позиции>     & Junior Python Dev (2019-2020) [SEP] Python Backend Engineer (2020-2024) <описание опыта на позиции> \\
     \hline
-    2          & Python Backend Engineer [SEP] (описание опыта на позиции) & Junior Python Dev [1YR][0-1YRS] [SEP] (описание опыта на позиции)                                                                               \\
+    2          & Python Backend Engineer <описание опыта на позиции> & Junior Python Dev (2019-2020) <описание опыта на позиции>                                           \\
     \hline
   \end{tabular}
 \end{table}
