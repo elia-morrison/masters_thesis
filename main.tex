@@ -738,6 +738,39 @@ Sentence Transformers — это библиотека, которая упрощ
   \item С помощью функции \texttt{KBinsDiscretizer} библиотеки \texttt{sklearn} \cite{pedregosa2018scikitlearnmachinelearningpython} были вычислены оптимальные границы для интервалов.
 \end{itemize}
 
+Распределение количества лет вместе в гистограммой, столбцы которой соответствуют дискретизированным интервалам, представлено на рисунке \ref{fig:experience_distribution}.
+
+\begin{figure}[H]
+  \centering
+  \begin{tikzpicture}
+    \begin{axis}[
+        width=0.8\textwidth,
+        height=0.6\textwidth,
+        xlabel={Количество лет},
+        ymin=0,
+        xmin=0,
+        xmax=30,
+        ytick=\empty,
+        ylabel=\empty,
+        legend pos=north east
+      ]
+      \addplot+[
+        ybar interval,
+        fill=cyan,
+        draw=black
+      ] table {plots/histogram.dat};
+      \addplot[
+        red,
+        thick
+      ] table {plots/kde.dat};
+      \legend{Гистограмма токенов, Плотность распределения}
+    \end{axis}
+  \end{tikzpicture}
+  \caption{\centering Дискретизация токена, отражающего, сколько лет назад была окончена работа на некоторой позиции}
+  \label{fig:experience_distribution}
+\end{figure}
+
+
 В функцию \texttt{KBinsDiscretizer} было передано заранее определённое количество интервалов. Выбор количества интервалов сказывается на работе модели следующим образом:
 
 \begin{itemize}
@@ -753,11 +786,11 @@ Sentence Transformers — это библиотека, которая упрощ
   \label{tab:position_encoding_example_2}
   \begin{tabular}{|c|p{7cm}|p{7cm}|}
     \hline
-    \textbf{№} & \textbf{Псевдо-вакансия (anchor)}                   & \textbf{Опыт кандидата (positive)}                                                                  \\
+    \textbf{№} & \textbf{Псевдо-вакансия (anchor)}                   & \textbf{Опыт кандидата (positive)}                                                                                                                                                                                                                                                                                                                      \\
     \hline
-    1          & IT Business Analyst <описание опыта на позиции>     & Junior Python Dev (2019-2020) [SEP] Python Backend Engineer (2020-2024) <описание опыта на позиции> \\
+    1          & IT Business Analyst <описание опыта на позиции>     & Junior Python Dev [2.0D] [2.0YA]\tablefootnote{[2.0D] --- токен <<2-4 года на позиции>> (D --- duration), [2.0YA] --- токен <<работа была завершена 2-4 года назад>> (YA --- years ago). Если позиция текущая, то вместо количества лет после окончания работы указывается 0.} [SEP] Python Backend Engineer [4.0D] [0.0YA] <описание опыта на позиции> \\
     \hline
-    2          & Python Backend Engineer <описание опыта на позиции> & Junior Python Dev (2019-2020) <описание опыта на позиции>                                           \\
+    2          & Python Backend Engineer <описание опыта на позиции> & Junior Python Dev [2.0D] [0.0YA] <описание опыта на позиции>                                                                                                                                                                                                                                                                                            \\
     \hline
   \end{tabular}
 \end{table}
