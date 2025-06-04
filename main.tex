@@ -14,6 +14,7 @@
 }
 \usepackage{tablefootnote}
 \usepackage{pgfplots}
+\usepackage{xurl}
 \pgfplotsset{compat=1.18}
 \pgfplotsset{
   every axis/.append style={
@@ -881,8 +882,45 @@ qdrant был выбран из-за того, что скорость вект�
 \addcontentsline{toc}{section}{Литература}
 \renewcommand{\refname}{\centering \textbf{Литература}}
 
-\bibliographystyle{rusnat}
-\bibliography{references}
+\begin{thebibliography}{99}
+
+  \bibitem{zhang-etal-2022-skillspan}
+  Zhang M., Jensen K. N., Sonniks S., Plank B. SkillSpan: Hard and Soft Skill Extraction from English Job Postings // Proceedings of the 2022 Conference of the North American Chapter of the Association for Computational Linguistics: Human Language Technologies. Seattle, United States : Association for Computational Linguistics, 2022. – P. 4962–4984.
+
+  \bibitem{yacenko2023}
+  Яценко А. А. Автоматический анализ текстов вакансий и резюме с помощью глубоких нейронных сетей : выпускная квалификационная работа. – Ростов н/Д : Южный федеральный университет, 2023.
+
+  \bibitem{ma2019nlpaug}
+  Ma E. NLP Augmentation. – URL: \url{https://github.com/makcedward/nlpaug} (дата обращения 01.05.2025).
+
+  \bibitem{xuan2021hardnegativeexampleshard}
+  Xuan H., Stylianou A., Liu X., Pless R. Hard negative examples are hard, but useful // arXiv preprint. 2021. – arXiv:2007.12749.
+
+  \bibitem{wolf2020huggingfacestransformersstateoftheartnatural}
+  Wolf T., Debut L., Sanh V., Chaumond J., Delangue C., Moi A., Cistac P., Rault T., Louf R., Funtowicz M., Davison J., Shleifer S., von Platen P., Ma C., Jernite Y., Plu J., Xu C., Le Scao T., Gugger S., Drame M., Lhoest Q., Rush A. M. HuggingFace's Transformers: State-of-the-art Natural Language Processing // arXiv preprint. 2020. – arXiv:1910.03771.
+
+  \bibitem{radford2018improving}
+  Radford A., Narasimhan K., Salimans T., Sutskever I. Improving Language Understanding by Generative Pre-Training. – URL: \url{https://cdn.openai.com/research-covers/language-unsupervised/language_understanding_paper.pdf} (дата обращения 01.05.2025).
+
+  \bibitem{pedregosa2018scikitlearnmachinelearningpython}
+  Pedregosa F., Varoquaux G., Gramfort A., Michel V., Thirion B., Grisel O., Blondel M., Müller A., Nothman J., Louppe G., Prettenhofer P., Weiss R., Dubourg V., Vanderplas J., Passos A., Cournapeau D., Brucher M., Perrot M., Duchesnay É. Scikit-learn: Machine Learning in Python // arXiv preprint. 2018. – arXiv:1201.0490.
+
+  \bibitem{zhang-etal-2024-nnose}
+  Zhang M., Goot R., Kan M.-Y., Plank B. NNOSE: Nearest Neighbor Occupational Skill Extraction // Proceedings of the 18th Conference of the European Chapter of the Association for Computational Linguistics. St. Julian's, Malta : Association for Computational Linguistics, 2024. – P. 589–608.
+
+  \bibitem{joveo_sentencebert_2022}
+  Dan S. Using SentenceBERT to Generate Job Embeddings for Applications at Joveo // Joveo Blog. 2022. – URL: \url{https://www.joveo.com/blog/using-sentencebert-to-generate-job-embeddings-for-applications-at-joveo/} (дата обращения 01.05.2025).
+
+  \bibitem{devlin2019bertpretrainingdeepbidirectional}
+  Devlin J., Chang M.-W., Lee K., Toutanova K. BERT: Pre-training of Deep Bidirectional Transformers for Language Understanding // arXiv preprint. 2019. – arXiv:1810.04805.
+
+  \bibitem{reimers2019sentencebertsentenceembeddingsusing}
+  Reimers N., Gurevych I. Sentence-BERT: Sentence Embeddings using Siamese BERT-Networks // arXiv preprint. 2019. – arXiv:1908.10084.
+
+  \bibitem{vaswani2023attentionneed}
+  Vaswani A., Shazeer N., Parmar N., Uszkoreit J., Jones L., Gomez A. N., Kaiser L., Polosukhin I. Attention Is All You Need // arXiv preprint. 2023. – arXiv:1706.03762.
+
+\end{thebibliography}
 
 %=======================
 \newpage
