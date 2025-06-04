@@ -117,3 +117,10 @@ extendedchars=\true, commentstyle=\ttfamily, keepspaces=true }
  \setlength{\parskip}{0.0pt}
  \setlength{\leftskip}{0.8cm}
 }
+
+\let\old@enumerate=\enumerate
+\def\enumerate{\old@enumerate
+ \setlength{\itemsep}{0pt}
+ \setlength{\parskip}{0.0pt}
+ \setlength{\leftskip}{0.8cm}
+}

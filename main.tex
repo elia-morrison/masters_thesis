@@ -193,7 +193,7 @@ Sentence Transformers — это библиотека, которая упрощ
   \centering
   \allowdisplaybreaks[1]
   \begin{split}
-    c(w) = \frac{1}{n(n-1)} \sum_{w_i \in W \setminus \{w\}} \sum_{w_j \in W \setminus \{w\}, w_j \neq w_i} sim(w_i, w_j)
+    c(w) = \frac{1}{n(n-1)} \sum_{w_i \in W \setminus \{w\}} \sum_{w_j \in W \setminus \{w\}, w_j \neq w_i} sim(w_i, w_j),
   \end{split}
 \end{equation}
 
@@ -375,7 +375,6 @@ Sentence Transformers — это библиотека, которая упрощ
 \end{itemize}
 
 Цель обучения заключается в том, чтобы расстояние между векторными представлениями якоря и позитивного примера было меньше, чем расстояние между якорем и негативным примером на некоторую величину (margin). Математически это можно выразить следующим образом:
-
 \begin{equation*}
   \centering
   \allowdisplaybreaks[1]
@@ -633,12 +632,11 @@ Sentence Transformers — это библиотека, которая упрощ
 Однако обучение нетривиально, так как на момент выполнения работы не существовало подходящей лосс-функции для описанной задачи и формата данных.
 
 В ходе экспериментов была разработана собственная лосс-функция, имеющая следующий вид:
-
 \begin{equation}
   \label{eq:custom_loss_function}
   L(p, q) = \begin{cases}
     (p - 0)^2 + (q - 1)^2 & \text{если } \text{margin} + p - q \geq 0 \\
-    0                     & \text{иначе}
+    0                     & \text{иначе},
   \end{cases}
 \end{equation}
 
@@ -682,9 +680,9 @@ Sentence Transformers — это библиотека, которая упрощ
 \begin{equation}
   \label{eq:assymetric_search_problem}
   \begin{aligned}
-    d(\text{junior developer}, & \text{senior developer}) \\
-                               & =                        \\
-    d(\text{senior developer}, & \text{junior developer})
+    d(\text{junior developer}, & \text{senior developer})  \\
+                               & =                         \\
+    d(\text{senior developer}, & \text{junior developer}),
   \end{aligned}
 \end{equation}
 
@@ -693,9 +691,9 @@ Sentence Transformers — это библиотека, которая упрощ
 \begin{equation}
   \label{eq:solved_assymetric_search_problem}
   \begin{aligned}
-    d(r_{f}(\text{junior developer}), & j_{f}(\text{senior developer})) \\
-                                      & \neq                            \\
-    d(r_{f}(\text{senior developer}), & j_{f}(\text{junior developer}))
+    d(r_{f}(\text{junior developer}), & j_{f}(\text{senior developer}))  \\
+                                      & \neq                             \\
+    d(r_{f}(\text{senior developer}), & j_{f}(\text{junior developer})),
   \end{aligned}
 \end{equation}
 
